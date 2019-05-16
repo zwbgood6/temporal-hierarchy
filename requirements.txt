@@ -1,0 +1,15 @@
+numpy==1.15.4
+matplotlib
+scikit-image
+opencv-python
+tensorflow-gpu==1.11.0
+tensorflow-probability-gpu==0.4.0
+dm-sonnet
+tqdm
+wrapt
+dominate
+recordclass
+
+gym
+moviepy
+mujoco-py
