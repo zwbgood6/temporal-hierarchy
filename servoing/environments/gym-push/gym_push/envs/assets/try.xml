@@ -1,0 +1,66 @@
+<mujoco>
+    <!-- Default settings for different tags of the model. -->
+    <default>
+        <joint pos="0 0 0" armature="0" damping="1" limited="true" />
+        <geom rgba="1 1 1 1" contype="1" conaffinity="1" />
+    </default>
+
+    <!-- Definition of all geometric shapes and joints. -->
+    <worldbody>
+        <!-- Diffuse lighting at position (0,0,3) pointing downwards in z direction. -->
+        <light diffuse=".7 .7 .7" pos="0 0 3" dir="0 0 -1" castshadow="false" />
+
+        <!-- Plane centered at origin with color green and size 1*1 unit^2. -->
+        <geom type="plane" size="1 1 1" pos="0 0 0" rgba="0 0.9 0 1" />
+
+        <!-- Build walls around the plane -->
+        <geom type="box" size="1 0.02 0.2" pos="0 1 0.1" rgba="0 0 0.9 1" />
+        <geom type="box" size="1 0.02 0.2" pos="0 -1 0.1" rgba="0 0 0.9 1" />
+        <geom type="box" size="0.02 1 0.2" pos="1 0 0.1" rgba="0 0 0.9 1" />
+        <geom type="box" size="0.02 1 0.2" pos="-1 0 0.1" rgba="0 0 0.9 1" />
+
+        <!-- Wrapper for the robot. Consists of a rail, a stick, and an arm. -->
+        <body name="robot" pos="0 0 0">
+            <!-- Rail centered at (0,0.8,0) with length 1 along x-axis that the robot body can slide on. -->
+            <geom name="rail" type="capsule" fromto="-0.5 0 0 0.5 0 0" size="0.02 1" />
+
+            <body name="cart" pos="0 0 0">
+                <!-- Joint allowing sliding along x-axis with dx \in (-1,1). -->
+                <joint name="slide_on_rail" type="slide" axis="1 0 0" range="-1 1" />
+
+                <!-- Joint allowing rotation along z-axis with da \in (-180,180) deg. -->
+                <joint name="rotate_on_stick" type="hinge" axis="0 0 1" range="-180 180" />
+
+                <!-- Stick on the rail that the robot arm is attached to. -->
+                <geom name="stick" type="capsule" fromto="0 0 0 0 0 0.2" size="0.02 0.2" />
+
+                <!-- Wrapper for the robot arm. -->
+                <body name="arm" pos="0 0 0.15">
+                    <joint name="slide_on_stick" type="slide" axis="0 1 0" range="0 2" />
+                    <geom type="capsule" fromto="0 0 0 0 -0.8 0" size="0.05 0.8" />
+                </body>
+            </body>
+        </body>
+
+        <!-- Ball for the robot to push. -->
+        <body name="ball" pos="0.5 0.5 0.1">
+            <geom type="sphere" size="0.05" rgba=".9 .9 0 1" conaffinity="0" />
+            <joint name="ball_slide_x" type="slide" pos="0 0 0" axis="1 0 0" range="-10 10" damping="0.5" />
+            <joint name="ball_slide_y" type="slide" pos="0 0 0" axis="0 1 0" range="-10 10" damping="0.5" />
+        </body>
+
+        <!-- Goal for the ball to be pushed to. -->
+        <body name="goal" pos="0.5 0.2 0.1">
+            <geom type="box" size="0.05 0.05 0.05" rgba="1 1 1 0.3" contype="0" conaffinity="0" />
+            <joint name="goal_slide_x" type="slide" pos="0 0 0" axis="1 0 0" range="-10 10" damping="0.5" />
+            <joint name="goal_slide_y" type="slide" pos="0 0 0" axis="0 1 0" range="-10 10" damping="0.5" />
+        </body>
+    </worldbody>
+
+    <!-- Actuators that can be controlled by action vector. -->
+    <actuator>
+        <motor joint="slide_on_rail" ctrlrange="-2.0 2.0" ctrllimited="true" />
+        <motor joint="rotate_on_stick" ctrlrange="-2.0 2.0" ctrllimited="true" />
+        <motor joint="slide_on_stick" ctrlrange="-2.0 2.0" ctrllimited="true" />
+    </actuator>
+</mujoco>

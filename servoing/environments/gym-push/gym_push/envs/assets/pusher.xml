@@ -1,0 +1,72 @@
+<mujoco>
+    <!-- Default settings for different tags of the model. -->
+    <default>
+        <joint pos="0 0 0" armature="1" limited="true" damping="1000" />
+        <geom pos="0 0 0" rgba=".4 .4 .4 1" condim="3" contype="0" conaffinity="0" />
+        <motor ctrlrange="-1 1" ctrllimited="true" gear="500" />
+    </default>
+
+    <compiler inertiafromgeom="true" />
+    <option gravity="0 0 -2" timestep="0.01"/>
+
+    <!-- Definition of all geometric shapes and joints. -->
+    <worldbody>
+        <!-- Diffuse lighting at position (0,0,3) pointing downwards in z direction. -->
+        <light diffuse=".5 .5 .5" pos="0 0 10" dir="0 0 -1" castshadow="false" />
+        
+        <!-- Plane centered at origin with color green and size 1*1 unit^2. -->
+        <geom name="table" type="plane" size="1 1 0.1" rgba="0 0.9 0 1" friction="0 0 0" contype="1" conaffinity="1" />
+
+        <!-- Build walls around the plane. -->
+        <geom type="box" size="1 0.02 0.2" pos="0 1 0.1" rgba="0 0 0.9 0.5"  contype="1" conaffinity="1" />
+        <geom type="box" size="1 0.02 0.2" pos="0 -1 0.1" rgba="0 0 0.9 0.5"  contype="1" conaffinity="1" /> 
+        <geom type="box" size="0.02 1 0.2" pos="1 0 0.1" rgba="0 0 0.9 0.5"  contype="1" conaffinity="1" />
+        <geom type="box" size="0.02 1 0.2" pos="-1 0 0.1" rgba="0 0 0.9 0.5"  contype="1" conaffinity="1" />
+
+        <!-- Build robotic arms. -->
+        <body name="robot" pos="0 0 1.12">
+            <joint name="cart_slide_x" type="slide" axis="1 0 0" range="-1 1" />
+            <joint name="cart_slide_y" type="slide" axis="0 1 0" range="-1 1" />
+            <joint name="cart_slide_z" type="slide" axis="0 0 1" range="0 0.3" />
+            <joint name="cart_rotate_z" type="hinge" axis="0 0 1" range="-124 124" />
+
+            <geom name="arm" type="box" size=".1 .05 .8" pos="0 0 0" />
+            <geom name="wrist" type="box" size=".11 .06 .05" pos="0 0 -0.8" rgba=".9 .9 .9 1" contype="1" conaffinity="1" />
+
+            <body name="l_hand" pos="-0.01 0 -0.9">
+                <joint name="l_hand_slide_x" type="slide" axis="-1 0 0" range="0 0.07" />
+                <geom name="l_finger" type="box" size="0.01 .05 .2" density="0.001" contype="1" conaffinity="1" />
+            </body>
+            
+            <body name="r_hand" pos="0.001 0 -0.9">
+                <joint name="r_hand_slide_x" type="slide" axis="1 0 0" range="0 0.07" />
+                <geom name="r_finger" type="box" size="0.01 .05 .2" density="0.001" contype="1" conaffinity="1" />
+            </body>
+        </body>
+
+        <!-- Ball for the robot to push. -->
+        <body name="ball" pos="0 0 0.05">
+            <geom type="sphere" size="0.05" rgba=".9 .9 0 1" density='0.00001' contype="1" conaffinity="1" />
+            <joint name="ball_slide_z" type="slide" axis="0 0 1" range="-10 10" damping="10.0" />
+            <joint name="ball_slide_x" type="slide" axis="1 0 0" range="-10 10" damping="10.0" />
+            <joint name="ball_slide_y" type="slide" axis="0 1 0" range="-10 10" damping="10.0" />
+        </body>
+
+        <!-- Goal for the ball to be pushed to. -->
+        <body name="goal" pos="0 0 0.05">
+            <geom type="box" size="0.05 0.05 0.05" rgba="1 1 1 0.3" contype="0" conaffinity="0" />
+            <joint name="goal_slide_x" type="slide" axis="1 0 0" range="-10 10" damping="0.5" />
+            <joint name="goal_slide_y" type="slide" axis="0 1 0" range="-10 10" damping="0.5" />
+        </body>
+    </worldbody>
+
+    <!-- Actuators that can be controlled by action vector. -->
+    <actuator>
+        <motor joint="cart_slide_x" />
+        <motor joint="cart_slide_y" />
+        <motor joint="cart_slide_z" />
+        <motor joint="cart_rotate_z" />
+        <motor joint="l_hand_slide_x" />
+        <motor joint="r_hand_slide_x" />
+    </actuator>
+</mujoco>
